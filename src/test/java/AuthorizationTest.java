@@ -1,22 +1,28 @@
-import model.OKUser;
+import model.Users;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import page.AuthorizationPage;
+import page.ProfileDrawer;
 
 import static com.codeborne.selenide.Selenide.open;
-import static com.codeborne.selenide.Selenide.sleep;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 public class AuthorizationTest {
     private static final String BASE_URL = "https://tamtam.chat";
+    private AuthorizationPage authorizationPage;
 
     @BeforeEach
     public void setUp() {
         open(BASE_URL);
+        authorizationPage = new AuthorizationPage();
     }
 
     @Test
     public void logInViaOK() {
-        new AuthorizationPage().logInViaOK().logInWith(new OKUser("kobyl17", "testQA_1"));
-        sleep(100_000_000_000L);
+        ProfileDrawer profileDrawer = authorizationPage.logInViaOK().logInWith(Users.okBot()).openProfile();
+        String profileName = profileDrawer.profileName();
+        String botEmail = Users.okBot().getEmail();
+        assertThat(profileName, equalTo(botEmail + " " + botEmail));
     }
 }

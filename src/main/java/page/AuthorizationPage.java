@@ -5,6 +5,8 @@ import ru.stombie.base.LoadablePage;
 
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.switchTo;
+import static com.codeborne.selenide.Selenide.webdriver;
 
 public class AuthorizationPage extends LoadablePage {
     private static final By OK_BUTTON = By.xpath(".//*[contains(@data-tsid, 'login_via_ok_button')]");
@@ -12,6 +14,7 @@ public class AuthorizationPage extends LoadablePage {
 
     public OKAuthorizationPage logInViaOK() {
         $(OK_BUTTON).shouldBe(visible.because("Не найдена кнопка входа через Одноклассники")).click();
+        switchTo().window(1);
         return new OKAuthorizationPage();
     }
 
