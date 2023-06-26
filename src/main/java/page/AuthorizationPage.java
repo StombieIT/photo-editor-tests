@@ -14,7 +14,6 @@ public class AuthorizationPage extends LoadablePage {
 
     public OKAuthorizationPage logInViaOK() {
         $(OK_BUTTON).shouldBe(visible.because("Не найдена кнопка входа через Одноклассники")).click();
-        switchTo().window(1);
         return new OKAuthorizationPage();
     }
 
