@@ -1,9 +1,8 @@
-import model.OKUser;
 import model.Users;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import page.AuthorizationPage;
+import page.MainPage;
 
 import static com.codeborne.selenide.Selenide.open;
 import static com.codeborne.selenide.Selenide.webdriver;
@@ -11,33 +10,26 @@ import static com.codeborne.selenide.Selenide.webdriver;
 public class PhotoEditorLayerTest {
     private static final String BASE_URL = "http://localhost:3000";
     private static final String UPLOADING_IMAGE_PATH = "/Users/vladislav.yartsev/dev/personal/photo-editor-tests/src/test/resources/uploadingImage.jpeg";
-    private static OKUser user;
-    private AuthorizationPage authorizationPage;
+    private static MainPage mainPage;
 
     @BeforeAll
     public static void globalSetUp() {
-        user = Users.okBot();
-    }
-
-    @BeforeEach
-    public void setUp() {
         open(BASE_URL);
         webdriver().object().manage().window().maximize();
-        authorizationPage = new AuthorizationPage();
+        mainPage = new AuthorizationPage().logInViaOK().logInWith(Users.okBot());
     }
 
     @Test
     public void openLayerTest() {
-        authorizationPage.logInViaOK().logInWith(user)
-                .openFirstChatRoom()
+        mainPage.openFirstChatRoom()
                 .upload(UPLOADING_IMAGE_PATH)
-                .openEditorForLastUploadedImage();
+                .openEditorForLastUploadedImage()
+                .close();
     }
 
     @Test
     public void closeAndEscapeTest() {
-        authorizationPage.logInViaOK().logInWith(user)
-                .openFirstChatRoom()
+        mainPage.openFirstChatRoom()
                 .upload(UPLOADING_IMAGE_PATH)
                 .openEditorForLastUploadedImage()
                 .close()
