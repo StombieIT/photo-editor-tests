@@ -5,7 +5,7 @@ public class Users {
 
     public static OKUser okBot() {
         if (okBot == null) {
-            okBot = new OKUser("Yarcev3", "testQA_1");
+            okBot = new OKUser("arturbesstrashnii", "testQA_1", "Артур", "Бесстрашный");
         }
         return okBot;
     }

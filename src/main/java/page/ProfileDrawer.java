@@ -12,7 +12,7 @@ public class ProfileDrawer extends LoadablePage {
     private static final By OVERLAY = By.xpath(".//*[contains(@class, 'drawer-overlay')]");
     private final MainPage initialPage;
 
-    public ProfileDrawer(MainPage initialPage) {
+    ProfileDrawer(MainPage initialPage) {
         this.initialPage = initialPage;
     }
 
