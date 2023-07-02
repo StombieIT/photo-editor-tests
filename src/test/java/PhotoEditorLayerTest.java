@@ -65,6 +65,15 @@ public class PhotoEditorLayerTest {
     }
 
     @Test
+    public void checkDoingCrop() throws IOException {
+        chatRoomWithUploadedImage.openEditorForLastUploadedImage()
+                .crop()
+                .done()
+                .makePhotoScreenshot()
+                .close();
+    }
+
+    @Test
     public void checkCreatingCrop() throws IOException {
         chatRoomWithUploadedImage.openEditorForLastUploadedImage()
                 .createCrop(Coordinate.by(15), Coordinate.by(200))
@@ -156,6 +165,37 @@ public class PhotoEditorLayerTest {
     }
 
     @Test
+    public void checkAfterDoneCrop() throws IOException {
+        chatRoomWithUploadedImage.openEditorForLastUploadedImage()
+                .crop()
+                .done()
+                .save()
+                .openEditorForLastUploadedImage()
+                .makePhotoScreenshot()
+                .close();
+    }
+
+    @Test
+    public void checkAfterDoneFlip() throws IOException {
+        chatRoomWithUploadedImage.openEditorForLastUploadedImage()
+                .flip()
+                .save()
+                .openEditorForLastUploadedImage()
+                .makePhotoScreenshot()
+                .close();
+    }
+
+    @Test
+    public void checkAfterDoneRotate() throws IOException {
+        chatRoomWithUploadedImage.openEditorForLastUploadedImage()
+                .rotate()
+                .save()
+                .openEditorForLastUploadedImage()
+                .makePhotoScreenshot()
+                .close();
+    }
+
+    @Test
     public void checkUndoAfter2Flips() throws IOException {
         PhotoEditorLayer photoEditorLayer = chatRoomWithUploadedImage.openEditorForLastUploadedImage().flip(2).makePhotoScreenshot();
         assertThrows(ElementNotFound.class, photoEditorLayer::checkUndo);
@@ -168,4 +208,5 @@ public class PhotoEditorLayerTest {
         assertThrows(ElementNotFound.class, photoEditorLayer::checkUndo);
         photoEditorLayer.close();
     }
+
 }

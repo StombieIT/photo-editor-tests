@@ -9,7 +9,8 @@ public enum PhotoLayerAction {
     RESIZE_BY_NW("nw"),
     RESIZE_BY_NE("ne"),
     RESIZE_BY_SW("sw"),
-    RESIZE_BY_SE("se");
+    RESIZE_BY_SE("se"),
+    DONE("d");
 
     private final String hint;
 

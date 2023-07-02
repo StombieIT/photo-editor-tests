@@ -7,8 +7,6 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.interactions.Actions;
 
 import java.io.IOException;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.StringJoiner;
 
 import static com.codeborne.selenide.Condition.visible;
@@ -23,10 +21,12 @@ public class PhotoEditorLayer extends ScreeningPage {
     private static final By MEDIA_CROP = By.xpath(".//msg-media-crop");
     private static final By EDITING_IMAGE = By.xpath(".//*[contains(@data-tsid, 'editing-image')]");
     private static final By CROP_BUTTON = By.xpath(".//msg-button[contains(@data-tsid, 'crop')]");
+    private static final By SAVE_BUTTON = By.xpath(".//msg-button[contains(@data-tsid, 'photo_layer_save_button')]");
     private static final By ROTATE_BUTTON = By.xpath(".//msg-button[contains(@data-tsid, 'rotate')]");
     private static final By FLIP_BUTTON = By.xpath(".//msg-button[contains(@data-tsid, 'flip')]");
     private static final By CLOSE_BUTTON = By.xpath(".//msg-button[contains(@class, 'close')]");
     private static final By UNDO_BUTTON = By.xpath(".//msg-button[contains(@class, 'undo')]");
+    private static final By DONE_BUTTON = By.xpath(".//msg-button[contains(@data-tsid, 'photo_layer_done_button')]");
     private static final By CROPPER = By.xpath(".//*[contains(@data-tsid, 'cropper')]");
     private static final By VERTEX_NW = By.xpath(".//*[contains(@data-id, 'nw')]");
     private static final By VERTEX_NE = By.xpath(".//*[contains(@data-id, 'ne')]");
@@ -35,7 +35,6 @@ public class PhotoEditorLayer extends ScreeningPage {
     private static final String FILENAME_DELIMITER = "_";
     private static final String FILE_EXTENSION = ".png";
     private final ChatRoom intialChatRoom;
-    private final Deque<PhotoLayerAction> actions = new LinkedList<>();
 
     PhotoEditorLayer(ChatRoom initialChatRoom) {
         this.intialChatRoom = initialChatRoom;
@@ -44,6 +43,7 @@ public class PhotoEditorLayer extends ScreeningPage {
     public ChatRoom close() {
         $(CLOSE_BUTTON).shouldBe(visible.because("Не найдена кнопка закрытия фоторедактора")).click();
         intialChatRoom.isLoaded();
+        intialChatRoom.photoLayerActionsHistory.clear();
         return intialChatRoom;
     }
 
@@ -56,7 +56,7 @@ public class PhotoEditorLayer extends ScreeningPage {
     public PhotoEditorLayer crop() {
         $(CROP_BUTTON).shouldBe(visible.because("Не найдена кнопка обрезки фото")).click();
         sleep(TRANSITION_TIME);
-        actions.addLast(PhotoLayerAction.CROP);
+        intialChatRoom.photoLayerActionsHistory.addLast(PhotoLayerAction.CROP);
         return this;
     }
 
@@ -67,7 +67,7 @@ public class PhotoEditorLayer extends ScreeningPage {
     public PhotoEditorLayer rotate() {
         $(ROTATE_BUTTON).shouldBe(visible.because("Не найдена кнопка поворота фото")).click();
         sleep(TRANSITION_TIME);
-        actions.addLast(PhotoLayerAction.ROTATE);
+        intialChatRoom.photoLayerActionsHistory.addLast(PhotoLayerAction.ROTATE);
         return this;
     }
 
@@ -78,7 +78,7 @@ public class PhotoEditorLayer extends ScreeningPage {
     public PhotoEditorLayer flip() {
         $(FLIP_BUTTON).shouldBe(visible.because("Не найдена кнопка флипа фото")).click();
         sleep(TRANSITION_TIME);
-        actions.addLast(PhotoLayerAction.FLIP);
+        intialChatRoom.photoLayerActionsHistory.addLast(PhotoLayerAction.FLIP);
         return this;
     }
 
@@ -88,7 +88,7 @@ public class PhotoEditorLayer extends ScreeningPage {
 
     public PhotoEditorLayer makePhotoScreenshot() throws IOException {
         StringJoiner photoFilenameJoiner = new StringJoiner(FILENAME_DELIMITER);
-        actions.stream().map(PhotoLayerAction::getHint).forEach(photoFilenameJoiner::add);
+        intialChatRoom.photoLayerActionsHistory.stream().map(PhotoLayerAction::getHint).forEach(photoFilenameJoiner::add);
         screenShotTo(
             $(MEDIA_CROP).shouldBe(visible.because("Не найдено редактируемое фото")),
             photoFilenameJoiner.toString() + FILE_EXTENSION
@@ -101,7 +101,7 @@ public class PhotoEditorLayer extends ScreeningPage {
                 .clickAndHold()
                 .moveByOffset(to.getX(), to.getY())
                 .perform();
-        actions.addLast(PhotoLayerAction.CREATE_CROP);
+        intialChatRoom.photoLayerActionsHistory.addLast(PhotoLayerAction.CREATE_CROP);
         return this;
     }
 
@@ -110,7 +110,7 @@ public class PhotoEditorLayer extends ScreeningPage {
                 .clickAndHold()
                 .moveByOffset(by.getX(), by.getY())
                 .perform();
-        actions.addLast(PhotoLayerAction.MOVE_CROP);
+        intialChatRoom.photoLayerActionsHistory.addLast(PhotoLayerAction.MOVE_CROP);
         return this;
     }
 
@@ -119,7 +119,7 @@ public class PhotoEditorLayer extends ScreeningPage {
                 .clickAndHold()
                 .moveByOffset(by.getX(), by.getY())
                 .perform();
-        actions.addLast(PhotoLayerAction.RESIZE_BY_NW);
+        intialChatRoom.photoLayerActionsHistory.addLast(PhotoLayerAction.RESIZE_BY_NW);
         return this;
     }
 
@@ -128,7 +128,7 @@ public class PhotoEditorLayer extends ScreeningPage {
                 .clickAndHold()
                 .moveByOffset(by.getX(), by.getY())
                 .perform();
-        actions.addLast(PhotoLayerAction.RESIZE_BY_NE);
+        intialChatRoom.photoLayerActionsHistory.addLast(PhotoLayerAction.RESIZE_BY_NE);
         return this;
     }
 
@@ -137,7 +137,7 @@ public class PhotoEditorLayer extends ScreeningPage {
                 .clickAndHold()
                 .moveByOffset(by.getX(), by.getY())
                 .perform();
-        actions.addLast(PhotoLayerAction.RESIZE_BY_SE);
+        intialChatRoom.photoLayerActionsHistory.addLast(PhotoLayerAction.RESIZE_BY_SE);
         return this;
     }
 
@@ -146,12 +146,24 @@ public class PhotoEditorLayer extends ScreeningPage {
                 .clickAndHold()
                 .moveByOffset(by.getX(), by.getY())
                 .perform();
-        actions.addLast(PhotoLayerAction.RESIZE_BY_SW);
+        intialChatRoom.photoLayerActionsHistory.addLast(PhotoLayerAction.RESIZE_BY_SW);
         return this;
     }
 
     public PhotoEditorLayer checkUndo() {
         $(UNDO_BUTTON).shouldBe(visible.because("Не найдена кнопка отмены изменений"));
+        return this;
+    }
+
+    public ChatRoom save() {
+        $(SAVE_BUTTON).shouldBe(visible.because("Не найдена кнопка завершения редактирования")).click();
+        return intialChatRoom;
+    }
+
+    public PhotoEditorLayer done() {
+        $(DONE_BUTTON).shouldBe(visible.because("Не найдена кнопка сохранения изменений")).click();
+        sleep(TRANSITION_TIME);
+        intialChatRoom.photoLayerActionsHistory.addLast(PhotoLayerAction.DONE);
         return this;
     }
 
